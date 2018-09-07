@@ -4,13 +4,18 @@
   "description": "Export Adobe Illustrator artboards",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "lib/index.js test-data/shapes.ai"
   },
   "author": "Daven Quinn",
   "license": "MIT",
   "dependencies": {
     "coffeescript": "^2.3.1",
     "jxa": "^2.0.3",
+    "osa2": "^0.2.3",
     "yargs": "^12.0.1"
+  },
+  "devDependencies": {
+    "browserify": "^16.2.2",
+    "coffeeify": "^3.0.1"
   }
 }
