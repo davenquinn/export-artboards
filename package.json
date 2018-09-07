@@ -1,0 +1,16 @@
+{
+  "name": "export-artboards",
+  "version": "1.0.0",
+  "description": "Export Adobe Illustrator artboards",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daven Quinn",
+  "license": "MIT",
+  "dependencies": {
+    "coffeescript": "^2.3.1",
+    "jxa": "^2.0.3",
+    "yargs": "^12.0.1"
+  }
+}
