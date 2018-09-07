@@ -1,19 +1,24 @@
-{argv} = require 'yargs'
-  .usage '$0 [OPTIONS] file'
-  .option 'format', {
-    describe: "File type"
-    type: 'string'
-    default: 'png'
-    }
-  .help 'h'
-  .alias 'h','help'
+yargs = require 'yargs'
 
-if argv._.length != 1
-  console.error "Illustrator file not specified"
-  process.exit(1)
+# Actually runs the command
+run = (argv)->
 
-iTunes = Application 'iTunes'
+  {argv} = yargs(argv)
+    .usage '$0 [OPTIONS] file'
+    .option 'format', {
+      describe: "File type"
+      type: 'string'
+      default: 'png'
+      }
+    .help 'h'
+    .alias 'h','help'
 
-name = iTunes.currentTrack.name()
+  if argv._.length != 1
+    console.error "Illustrator file not specified"
+    process.exit(1)
 
-console.log argv
+  iTunes = Application 'iTunes'
+
+  name = iTunes.currentTrack.name()
+
+  console.log name
