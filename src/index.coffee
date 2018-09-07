@@ -1,24 +1,20 @@
-yargs = require 'yargs'
+min = require 'minimist'
+ObjC.import("stdlib")
 
+args = $.NSProcessInfo.processInfo.arguments
+
+argv = []
+for i in [0...args.count]
+  val = ObjC.unwrap(args.objectAtIndex(i))
+  console.log i, val
+  argv.push val
+
+console.log argv
 # Actually runs the command
-run = (argv)->
 
-  {argv} = yargs(argv)
-    .usage '$0 [OPTIONS] file'
-    .option 'format', {
-      describe: "File type"
-      type: 'string'
-      default: 'png'
-      }
-    .help 'h'
-    .alias 'h','help'
+iTunes = Application 'iTunes'
 
-  if argv._.length != 1
-    console.error "Illustrator file not specified"
-    process.exit(1)
+name = iTunes.currentTrack.name()
 
-  iTunes = Application 'iTunes'
-
-  name = iTunes.currentTrack.name()
-
-  console.log name
+$.exit(0)
+console.log name
