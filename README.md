@@ -1,4 +1,4 @@
-# export-artboards
+# Export artboards from Adobe Illustrator documents
 
 `export-artboards` is a Mac OS "Javascript for Automation" script
 packaged as a command-line application. It exports all of the artboards
@@ -27,6 +27,10 @@ OPTS:
 --preset          PDF export preset
                   default "[Smallest File Size]" (same
                   as Illustrator default)
+ARGS:
+docFile           Illustrator document
+exportFolder      Folder in which to export (will be
+                  created if it doesn't exist)
 ```
 
 ## Contributing
