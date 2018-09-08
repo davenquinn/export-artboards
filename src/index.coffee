@@ -19,11 +19,13 @@ for i in [4...args.count]
 
 args = min argv, {
   boolean: ['create-folders']
-  string: ['format']
+  string: ['format', 'preset']
   default: {
     'create-folders': false
     'format': 'png8'
+    'preset': '[Smallest File Size]'
   }
+  alias: {f: 'format'}
 }
 
 if args._.length < 2
@@ -54,7 +56,7 @@ if not running
 app.open(docFile)
 doc = app.currentDocument
 
-# Run JSX
+# Run JSX to flip export option
 pref = 'plugin/SmartExportUI/CreateFoldersPreference'
 i = args['create-folders'] | 0
 app.doJavascript(
@@ -65,10 +67,15 @@ fileManager = $.NSFileManager.defaultManager
 if !fileManager.fileExistsAtPath(exportFolder)
   fileManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(exportFolder, false, $(), $())
 
+opts = {}
+if format == 'pdf'
+  opts.PDFPreset = args['pdf-preset']
+
 try
   doc.exportforscreens {
     toFolder: exportFolder
     as:"se_#{format}"
+    withOptions: opts
   }
 catch
   fail "Could not export for screens"
