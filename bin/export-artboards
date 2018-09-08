@@ -239,9 +239,36 @@ function isNumber (x) {
 
 
 },{}],2:[function(require,module,exports){
-var args, argv, doc, filename, i, ill, j, min, ref, val;
+module.exports = shellescape;
+
+// return a shell compatible format
+function shellescape(a) {
+  var ret = [];
+
+  a.forEach(function(s) {
+    if (!/^[A-Za-z0-9_\/-]+$/.test(s)) {
+      s = "'"+s.replace(/'/g,"'\\''")+"'";
+      s = s.replace(/^(?:'')+/g, '') // unduplicate single-quote at the beginning
+        .replace(/\\'''/g, "\\'" ); // remove non-escaped single-quote if there are enclosed between 2 escaped
+    }
+    ret.push(s);
+  });
+
+  return ret.join(' ');
+}
+
+},{}],3:[function(require,module,exports){
+// Unlike yargs, minimist does not appear to refer to modules like "fs"
+var app, args, argv, doc, docFile, esc, fail, folder, format, formats, i, j, min, pref, ref, script, val;
 
 min = require('minimist');
+
+esc = require('shell-escape');
+
+fail = function(msg) {
+  console.error(msg);
+  return $.exit(1);
+};
 
 ObjC.import("stdlib");
 
@@ -258,30 +285,70 @@ for (i = j = 4, ref = args.count; (4 <= ref ? j < ref : j > ref); i = 4 <= ref ?
   argv.push(val);
 }
 
-// Actually runs the command
-ill = Application('Adobe Illustrator');
+args = min(argv, {
+  boolean: ['create-folders'],
+  string: ['format'],
+  default: {
+    'create-folders': false,
+    'format': 'png8'
+  }
+});
 
-if (!ill.activate()) {
+if (args._.length < 2) {
+  fail("Not enough arguments");
+} else if (args._.length > 2) {
+  fail("Too many arguments");
+}
+
+formats = ['png', 'png8', 'png24', 'pdf', 'svg'];
+
+({format} = args);
+
+if (format === 'png') {
+  format += '8';
+}
+
+if (formats.indexOf(format) === -1) {
+  fail(`Improper format ${format} specified`);
+}
+
+[docFile, folder] = args._;
+
+// Actually runs the command
+app = Application('Adobe Illustrator');
+
+if (!app.activate()) {
   // If application doesn't exist then exit
   $.exit(0);
 }
 
-if (!ill.launch()) {
+if (!app.launch()) {
   $.exit(0);
 }
 
-filename = argv[0];
+console.log(docFile);
 
-ill.open("/Users/Daven/Projects/Tools/export-artboards/test-data/shapes.ai");
+app.open(docFile);
 
-doc = ill.currentDocument;
+doc = app.currentDocument;
 
 // Run JSX
-ill.doJavascript("app.preferences.setIntegerPreference('plugin/SmartExportUI/CreateFoldersPreference', 1)");
+pref = 'plugin/SmartExportUI/CreateFoldersPreference';
+
+i = args['create-folders'] | 0;
+
+app.doJavascript(`app.preferences.setIntegerPreference('${pref}', ${i});`);
+
+script = esc(["mkdir", "-p", folder]);
+
+// Make folder if it doesn't exist
+app.doShellScript(script);
+
+console.log(script);
 
 doc.exportforscreens({
-  toFolder: "~/Documents",
-  as: "se_pdf"
+  toFolder: folder,
+  as: `se_${format}`
 });
 
 doc.close();
@@ -290,4 +357,4 @@ doc.close();
 $.exit(0);
 
 
-},{"minimist":1}]},{},[2]);
+},{"minimist":1,"shell-escape":2}]},{},[3]);

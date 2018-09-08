@@ -4,7 +4,7 @@
   "description": "Export Adobe Illustrator artboards",
   "main": "src/index.coffee",
   "scripts": {
-    "test": "make; bin/export-artboards test-data/shapes.ai"
+    "test": "make test"
   },
   "author": "Daven Quinn",
   "license": "MIT",
@@ -13,6 +13,7 @@
     "browserify": "^16.2.2",
     "coffeeify": "^3.0.1",
     "coffeescript": "^2.3.1",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "shell-escape": "^0.2.0"
   }
 }
