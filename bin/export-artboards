@@ -259,14 +259,14 @@ function shellescape(a) {
 
 },{}],3:[function(require,module,exports){
 // Unlike yargs, minimist does not appear to refer to modules like "fs"
-var app, args, argv, doc, docFile, esc, exportFolder, fail, fileManager, format, formats, i, j, min, pref, ref, val;
+var app, args, argv, doc, docFile, esc, exportFolder, fail, fileManager, format, formats, i, j, min, pref, ref, running, val;
 
 min = require('minimist');
 
 esc = require('shell-escape');
 
 fail = function(msg) {
-  console.error(msg);
+  console.log(msg);
   return $.exit(1);
 };
 
@@ -322,13 +322,13 @@ app = Application('Adobe Illustrator');
 
 app.includeStandardAdditions = true;
 
-if (!app.activate()) {
-  // If application doesn't exist then exit
-  $.exit(0);
-}
+// If application doesn't exist then exit
+running = app.running();
 
-if (!app.launch()) {
-  $.exit(0);
+if (!running) {
+  if (!app.launch()) {
+    fail("Could not launch Adobe Illustrator");
+  }
 }
 
 app.open(docFile);
@@ -342,23 +342,26 @@ i = args['create-folders'] | 0;
 
 app.doJavascript(`app.preferences.setIntegerPreference('${pref}', ${i});`);
 
-console.log(docFile, exportFolder);
-
 fileManager = $.NSFileManager.defaultManager;
 
 if (!fileManager.fileExistsAtPath(exportFolder)) {
   fileManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(exportFolder, false, $(), $());
 }
 
-//script = esc ["mkdir", "-p", folder]
-//# Make folder if it doesn't exist
-//app.doShellScript script
-doc.exportforscreens({
-  toFolder: exportFolder,
-  as: `se_${format}`
-});
+try {
+  doc.exportforscreens({
+    toFolder: exportFolder,
+    as: `se_${format}`
+  });
+} catch (error) {
+  fail("Could not export for screens");
+}
 
 doc.close();
+
+if (!running) {
+  app.quit();
+}
 
 // This took a while to find
 $.exit(0);

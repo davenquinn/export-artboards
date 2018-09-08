@@ -3,7 +3,7 @@ min = require 'minimist'
 esc = require 'shell-escape'
 
 fail = (msg)->
-  console.error msg
+  console.log msg
   $.exit(1)
 
 ObjC.import("stdlib")
@@ -47,8 +47,9 @@ app = Application 'Adobe Illustrator'
 app.includeStandardAdditions = true
 
 # If application doesn't exist then exit
-$.exit(0) unless app.activate()
-$.exit(0) unless app.launch()
+running = app.running()
+if not running
+  fail("Could not launch Adobe Illustrator") unless app.launch()
 
 app.open(docFile)
 doc = app.currentDocument
@@ -64,12 +65,18 @@ fileManager = $.NSFileManager.defaultManager
 if !fileManager.fileExistsAtPath(exportFolder)
   fileManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(exportFolder, false, $(), $())
 
-doc.exportforscreens {
-  toFolder: exportFolder
-  as:"se_#{format}"
-}
+try
+  doc.exportforscreens {
+    toFolder: exportFolder
+    as:"se_#{format}"
+  }
+catch
+  fail "Could not export for screens"
 
 doc.close()
+
+if not running
+  app.quit()
 
 # This took a while to find
 $.exit(0)
