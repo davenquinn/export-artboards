@@ -38,5 +38,8 @@ exportFolder      Folder in which to export (will be
 Node JS is required to build; run `npm install` to get required modules
 for bundling executable, and then run `make` to build. `make test` both
 builds and attempts to export a test document containing two artboards to PNG.
+The script currently works only on Mac OS but an alternative
+implementation for Windows could be created using COM scripting,
+potentially using the same API.
 
 
