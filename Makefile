@@ -9,4 +9,4 @@ bin/export-artboards: src/index.coffee
 .PHONY: test
 test: bin/export-artboards
 	$^ --format png \
-		/Users/Daven/Projects/Tools/export-artboards/test-data/shapes.ai /Users/Daven/Projects/Tools/export-artboards/test-export
+		test-data/shapes.ai test-export

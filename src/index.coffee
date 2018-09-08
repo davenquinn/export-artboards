@@ -37,17 +37,18 @@ format += '8' if format == 'png'
 if formats.indexOf(format) == -1
   fail "Improper format #{format} specified"
 
-[docFile, folder] = args._
+# Get absolute paths
+docFile = Path(args._[0]).toString()
+exportFolder = Path(args._[1]).toString()
 
 # Actually runs the command
 
 app = Application 'Adobe Illustrator'
+app.includeStandardAdditions = true
 
 # If application doesn't exist then exit
 $.exit(0) unless app.activate()
 $.exit(0) unless app.launch()
-
-console.log docFile
 
 app.open(docFile)
 doc = app.currentDocument
@@ -59,12 +60,12 @@ app.doJavascript(
   "app.preferences.setIntegerPreference('#{pref}', #{i});"
 )
 
-script = esc ["mkdir", "-p", folder]
-# Make folder if it doesn't exist
-app.doShellScript script
+fileManager = $.NSFileManager.defaultManager
+if !fileManager.fileExistsAtPath(exportFolder)
+  fileManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(exportFolder, false, $(), $())
 
 doc.exportforscreens {
-  toFolder: folder
+  toFolder: exportFolder
   as:"se_#{format}"
 }
 
