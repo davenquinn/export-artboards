@@ -239,33 +239,55 @@ function isNumber (x) {
 
 
 },{}],2:[function(require,module,exports){
-var args, argv, i, iTunes, j, min, name, ref, val;
+var args, argv, doc, filename, i, ill, j, min, ref, val;
 
 min = require('minimist');
 
 ObjC.import("stdlib");
 
+// Note: `debugger` statements can be added to debug
+// this script with the Safari Web Inspector (Safari must be running)
+
+// Create arguments array, ignoring script name
 args = $.NSProcessInfo.processInfo.arguments;
 
 argv = [];
 
-for (i = j = 0, ref = args.count; (0 <= ref ? j < ref : j > ref); i = 0 <= ref ? ++j : --j) {
+for (i = j = 4, ref = args.count; (4 <= ref ? j < ref : j > ref); i = 4 <= ref ? ++j : --j) {
   val = ObjC.unwrap(args.objectAtIndex(i));
-  console.log(i, val);
   argv.push(val);
 }
 
-console.log(argv);
-
 // Actually runs the command
-iTunes = Application('iTunes');
+ill = Application('Adobe Illustrator');
 
-name = iTunes.currentTrack.name();
+if (!ill.activate()) {
+  // If application doesn't exist then exit
+  $.exit(0);
+}
 
+if (!ill.launch()) {
+  $.exit(0);
+}
+
+filename = argv[0];
+
+ill.open("/Users/Daven/Projects/Tools/export-artboards/test-data/shapes.ai");
+
+doc = ill.currentDocument;
+
+// Run JSX
+ill.doJavascript("app.preferences.setIntegerPreference('plugin/SmartExportUI/CreateFoldersPreference', 1)");
+
+doc.exportforscreens({
+  toFolder: "~/Documents",
+  as: "se_pdf"
+});
+
+doc.close();
+
+// This took a while to find
 $.exit(0);
-
-console.log(name);
 
 
 },{"minimist":1}]},{},[2]);
-;ObjC.import("stdlib");$.exit(0)
