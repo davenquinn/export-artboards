@@ -37,13 +37,14 @@ for i in [4...args.count]
 args = min argv, {
   boolean: ['create-folders']
   flags: ['help']
-  integer: ['resolution']
+  integer: ['resolution', 'scale']
   string: ['format', 'preset']
   default: {
     'create-folders': false
     'format': 'png8'
     'preset': '[Smallest File Size]'
     'dpi': 300
+    'scale': 100
   }
   alias: {f: 'format', h: 'help', d: 'dpi'}
 }
@@ -94,8 +95,11 @@ if !fileManager.fileExistsAtPath(exportFolder)
 opts = {}
 if format == 'pdf'
   opts.PDFPreset = args['pdf-preset']
-else
-  opts.resolution = args.dpi
+if format == 'png8'
+  opts = {
+    horizontalScaling: args.scale,
+    verticalScaling: args.scale
+  }
 
 try
   doc.exportforscreens {

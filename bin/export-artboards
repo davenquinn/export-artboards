@@ -290,13 +290,14 @@ for (i = j = 4, ref = args.count; (4 <= ref ? j < ref : j > ref); i = 4 <= ref ?
 args = min(argv, {
   boolean: ['create-folders'],
   flags: ['help'],
-  integer: ['resolution'],
+  integer: ['resolution', 'scale'],
   string: ['format', 'preset'],
   default: {
     'create-folders': false,
     'format': 'png8',
     'preset': '[Smallest File Size]',
-    'dpi': 300
+    'dpi': 300,
+    'scale': 100
   },
   alias: {
     f: 'format',
@@ -368,8 +369,13 @@ opts = {};
 
 if (format === 'pdf') {
   opts.PDFPreset = args['pdf-preset'];
-} else {
-  opts.resolution = args.dpi;
+}
+
+if (format === 'png8') {
+  opts = {
+    horizontalScaling: args.scale,
+    verticalScaling: args.scale
+  };
 }
 
 try {
