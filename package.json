@@ -8,7 +8,9 @@
   },
   "author": "Daven Quinn",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "meow": "^5.0.0"
+  },
   "devDependencies": {
     "browserify": "^16.2.2",
     "coffeeify": "^3.0.1",

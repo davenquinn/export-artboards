@@ -1,3 +1,20 @@
+helpText = """
+export-artboards [OPTS] docFile exportFolder
+
+OPTS:
+--format/-f       Export format [png*,png8,png24,pdf,svg]
+                  * default (alias for `png8`)
+--create-folders  Whether to create subfolders
+                  [boolean default false]
+--preset          PDF export preset
+                  default "[Smallest File Size]" (same
+                  as Illustrator default)
+--dpi/-d          Resolution for image [default 300]
+ARGS:
+docFile           Illustrator document
+exportFolder      Folder in which to export (will be
+                  created if it doesn't exist)
+"""
 # Unlike yargs, minimist does not appear to refer to modules like "fs"
 min = require 'minimist'
 esc = require 'shell-escape'
@@ -19,14 +36,21 @@ for i in [4...args.count]
 
 args = min argv, {
   boolean: ['create-folders']
+  flags: ['help']
+  integer: ['resolution']
   string: ['format', 'preset']
   default: {
     'create-folders': false
     'format': 'png8'
     'preset': '[Smallest File Size]'
+    'dpi': 300
   }
-  alias: {f: 'format'}
+  alias: {f: 'format', h: 'help', d: 'dpi'}
 }
+
+if args.help
+  console.log helpText
+  $.exit(0)
 
 if args._.length < 2
   fail "Not enough arguments"
@@ -70,6 +94,8 @@ if !fileManager.fileExistsAtPath(exportFolder)
 opts = {}
 if format == 'pdf'
   opts.PDFPreset = args['pdf-preset']
+else
+  opts.resolution = args.dpi
 
 try
   doc.exportforscreens {

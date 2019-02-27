@@ -258,9 +258,11 @@ function shellescape(a) {
 }
 
 },{}],3:[function(require,module,exports){
-// Unlike yargs, minimist does not appear to refer to modules like "fs"
-var app, args, argv, doc, docFile, esc, exportFolder, fail, fileManager, format, formats, i, j, min, opts, pref, ref, running, val;
+var app, args, argv, doc, docFile, esc, exportFolder, fail, fileManager, format, formats, helpText, i, j, min, opts, pref, ref, running, val;
 
+helpText = "export-artboards [OPTS] docFile exportFolder\n\nOPTS:\n--format/-f       Export format [png*,png8,png24,pdf,svg]\n                  * default (alias for `png8`)\n--create-folders  Whether to create subfolders\n                  [boolean default false]\n--preset          PDF export preset\n                  default \"[Smallest File Size]\" (same\n                  as Illustrator default)\n--dpi/-d          Resolution for image [default 300]\nARGS:\ndocFile           Illustrator document\nexportFolder      Folder in which to export (will be\n                  created if it doesn't exist)";
+
+// Unlike yargs, minimist does not appear to refer to modules like "fs"
 min = require('minimist');
 
 esc = require('shell-escape');
@@ -287,16 +289,26 @@ for (i = j = 4, ref = args.count; (4 <= ref ? j < ref : j > ref); i = 4 <= ref ?
 
 args = min(argv, {
   boolean: ['create-folders'],
+  flags: ['help'],
+  integer: ['resolution'],
   string: ['format', 'preset'],
   default: {
     'create-folders': false,
     'format': 'png8',
-    'preset': '[Smallest File Size]'
+    'preset': '[Smallest File Size]',
+    'dpi': 300
   },
   alias: {
-    f: 'format'
+    f: 'format',
+    h: 'help',
+    d: 'dpi'
   }
 });
+
+if (args.help) {
+  console.log(helpText);
+  $.exit(0);
+}
 
 if (args._.length < 2) {
   fail("Not enough arguments");
@@ -356,6 +368,8 @@ opts = {};
 
 if (format === 'pdf') {
   opts.PDFPreset = args['pdf-preset'];
+} else {
+  opts.resolution = args.dpi;
 }
 
 try {
