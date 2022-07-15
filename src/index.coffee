@@ -92,23 +92,48 @@ fileManager = $.NSFileManager.defaultManager
 if !fileManager.fileExistsAtPath(exportFolder)
   fileManager.createDirectoryAtPathWithIntermediateDirectoriesAttributesError(exportFolder, false, $(), $())
 
-opts = {}
-if format == 'pdf'
-  opts.PDFPreset = args['pdf-preset']
-if format == 'png8'
-  opts = {
-    horizontalScaling: args.scale,
-    verticalScaling: args.scale
-  }
+# https://ai-scripting.docsforadobe.dev/jsobjref/PDFSaveOptions.html
 
-try
-  doc.exportforscreens {
-    toFolder: exportFolder
-    as:"se_#{format}"
-    withOptions: opts
-  }
-catch
-  fail "Could not export for screens"
+# Some info about running extendscripts: https://stackoverflow.com/questions/52489315/run-illustrator-extendscript-through-automator-applescript-or-bash
+
+if format == 'pdf'
+  console.log "PDF preset: #{args.preset}"
+  # We now run PDF export in extendScript so we can easily modify presets
+  app.doJavascript(
+    """#target illustrator
+    exportPNGs();
+    function exportPNGs() {
+      app.userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;  
+      var basePath = '#{exportFolder}';
+      var doc = app.activeDocument;
+      var opts = new PDFSaveOptions();
+      opts.pDFPreset = '#{args.preset}';
+  
+      for ( var i = 0; i < doc.artboards.length; i++ ) {
+        var artboard = app.activeDocument.artboards[i];
+			  var artboardName = artboard.name;
+        var destFile = new File( basePath + "/" + artboardName + '.pdf' );
+        opts.artboardRange = (i+1).toString();
+        doc.saveAs( destFile, opts, i, artboardName);
+      };
+      app.userInteractionLevel = UserInteractionLevel.DISPLAYALERTS;
+    };""")
+else
+  opts = {}
+  if format == 'png8'
+    opts = {
+      horizontalScaling: args.scale,
+      verticalScaling: args.scale
+    }
+
+  try
+    doc.exportforscreens {
+      toFolder: exportFolder
+      as:"se_#{format}"
+      withOptions: opts
+    }
+  catch
+    fail "Could not export for screens"
 
 doc.close()
 
