@@ -1,6 +1,6 @@
 {
   "name": "export-artboards",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Export Adobe Illustrator artboards",
   "main": "src/index.coffee",
   "scripts": {
@@ -8,9 +8,6 @@
   },
   "author": "Daven Quinn",
   "license": "MIT",
-  "dependencies": {
-    "meow": "^5.0.0"
-  },
   "devDependencies": {
     "browserify": "^16.2.2",
     "coffeeify": "^3.0.1",
